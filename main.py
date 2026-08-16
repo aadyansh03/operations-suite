@@ -9,7 +9,6 @@ import sqlite3
 import tkinter as tk
 from tkinter import messagebox, ttk
 
-# --- DATABASE SETUP ---
 DB_NAME = "exhar_suite.db"
 
 def init_db():
@@ -27,7 +26,8 @@ def init_db():
             status TEXT NOT NULL
         )
     ''')
-    # Table 2: Inventory
+
+    
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS inventory (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -40,31 +40,26 @@ def init_db():
     conn.commit()
     conn.close()
 
-# --- MAIN APPLICATION CLASS ---
+
 class ExharSuiteApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Exhar Formulations - Operations Suite")
         self.root.geometry("900x600")
         
-        # Style configurations
         style = ttk.Style()
         style.theme_use('clam')
         style.configure("TNotebook", background="#f4f7f4")
         style.configure("TNotebook.Tab", font=("Helvetica", 11, "bold"), padding=[15, 5])
         style.map("TNotebook.Tab", background=[("selected", "#1b5e20")], foreground=[("selected", "white")])
 
-        # App Header
-        # App Header
         header = tk.Frame(self.root, bg="#1b5e20", pady=10)
         header.pack(fill="x")
         tk.Label(header, text="Exhar Formulations | Central Operations Suite", font=("Helvetica", 16, "bold"), fg="white", bg="#1b5e20").pack()
 
-        # Tab Setup
         self.notebook = ttk.Notebook(self.root)
         self.notebook.pack(fill="both", expand=True, padx=10, pady=10)
 
-        # Create Tabs
         self.tab_credit = tk.Frame(self.notebook, bg="#f4f7f4")
         self.tab_inventory = tk.Frame(self.notebook, bg="#f4f7f4")
         self.tab_calc = tk.Frame(self.notebook, bg="#f4f7f4")
@@ -73,14 +68,11 @@ class ExharSuiteApp:
         self.notebook.add(self.tab_inventory, text="Inventory & Expiries")
         self.notebook.add(self.tab_calc, text="Batch Calculator")
 
-        # Build UI for each tab
         self.build_credit_tab()
         self.build_inventory_tab()
         self.build_calc_tab()
 
-    # ==========================================
-    # TAB 1: FARM CREDIT LEDGER
-    # ==========================================
+    # FARM CREDIT LEDGER
     def build_credit_tab(self):
         form_frame = tk.LabelFrame(self.tab_credit, text=" Record New Transaction ", font=("Helvetica", 10, "bold"), bg="#f4f7f4", padx=10, pady=10)
         form_frame.pack(fill="x", padx=10, pady=5)
@@ -108,7 +100,7 @@ class ExharSuiteApp:
 
         tk.Button(form_frame, text="Add Record", command=self.add_credit, bg="#2e7d32", fg="white", width=15).grid(row=2, column=3, pady=5)
 
-        # Treeview
+       
         self.tree_credit = ttk.Treeview(self.tab_credit, columns=("id", "farm", "contact", "total", "paid", "bal", "due", "status"), show="headings", height=10)
         for col in self.tree_credit["columns"]:
             self.tree_credit.heading(col, text=col.title())
@@ -143,9 +135,8 @@ class ExharSuiteApp:
             self.tree_credit.insert("", "end", values=(row[0], row[1], row[2], f"₹{row[3]}", f"₹{row[4]}", f"₹{bal}", row[5], row[6]))
         conn.close()
 
-    # ==========================================
-    # TAB 2: INVENTORY & EXPIRIES
-    # ==========================================
+    #INVENTORY & EXPIRIES
+    
     def build_inventory_tab(self):
         form_frame = tk.LabelFrame(self.tab_inventory, text=" Add New Stock Batch ", font=("Helvetica", 10, "bold"), bg="#f4f7f4", padx=10, pady=10)
         form_frame.pack(fill="x", padx=10, pady=5)
@@ -169,7 +160,7 @@ class ExharSuiteApp:
 
         tk.Button(form_frame, text="Add Stock", command=self.add_inventory, bg="#2e7d32", fg="white", width=15).grid(row=1, column=4, padx=10)
 
-        # Treeview
+        
         self.tree_inv = ttk.Treeview(self.tab_inventory, columns=("id", "product", "batch", "qty", "expiry"), show="headings", height=10)
         for col in self.tree_inv["columns"]:
             self.tree_inv.heading(col, text=col.title())
@@ -198,9 +189,7 @@ class ExharSuiteApp:
             self.tree_inv.insert("", "end", values=row)
         conn.close()
 
-    # ==========================================
-    # TAB 3: BATCH CALCULATOR
-    # ==========================================
+    # BATCH CALCULATOR
     def build_calc_tab(self):
         frame = tk.Frame(self.tab_calc, bg="#f4f7f4", padx=20, pady=20)
         frame.pack(fill="both", expand=True)
@@ -224,7 +213,7 @@ class ExharSuiteApp:
         self.calc_result.grid(row=3, column=0, columnspan=2, pady=15)
 
     def calculate_batch(self):
-        # Base recipes per 1 Unit (1 Liter or 1000 Boluses)
+    # Base recipes per 1 Unit
         formulas = {
             "Exhar-Cal Gel (Per Liter)": {"Calcium Carbonate": "43.5 g", "Phosphorus": "21.7 g", "Vitamin D3": "8000 IU", "Syrup Base": "920 ml"},
             "MastiGuard Bolus (Per 1000 Boluses)": {"Serratiopeptidase": "15 g", "Herbal Extract Blend": "500 g", "Starch Binder": "150 g"}
@@ -245,7 +234,7 @@ class ExharSuiteApp:
         except ValueError:
             messagebox.showerror("Error", "Multiplier must be a valid number.")
 
-# --- ENTRY POINT ---
+
 if __name__ == "__main__":
     init_db()
     root = tk.Tk()
